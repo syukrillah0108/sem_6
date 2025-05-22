@@ -1,0 +1,31 @@
+{
+    "https://elearning-v2.utb-univ.ac.id/":{
+        "Login Mahasiswa": {
+            "link": "https://elearning-v2.utb-univ.ac.id/mahasiswa/login",
+            "not": {
+                "username": "invalid",
+                "password": "invalid",
+                "action": "error message",
+                "direct": "https://elearning-v2.utb-univ.ac.id/mahasiswa/login"
+            },
+            "and": {
+                "username": "valid",
+                "password": "valid",
+                "action": "login successful",
+                "direct": "https://elearning-v2.utb-univ.ac.id/mahasiswa/beranda"
+            },
+            "or": {
+                "username": "valid",
+                "password": "invalid",
+                "action": "error message",
+                "direct": "https://elearning-v2.utb-univ.ac.id/mahasiswa/login"
+            },
+            "xor": {
+                "username": "invalid",
+                "password": "valid",
+                "action": "error message",
+                "direct": "https://elearning-v2.utb-univ.ac.id/mahasiswa/login"
+            }
+        }
+    }
+}
