@@ -12,6 +12,6 @@ Operasional bus **Travelo Tralala** berlangsung hingga pukul 20:00. Setelah perj
 # Konsep
 
 * **Line Follower** : Kendaraan akan mengikuti jalur yang telah diprogram, meniru trayek bus pada umumnya.
-* **Deteksi Rambu dan Lampu Lalu Lintas** : Modul sensor akan mengenali lampu merah untuk berhenti, mendukung kepatuhan pada peraturan lalu lintas.
+* **Deteksi Rambu dan Lampu Lalu Lintas** : Modul sensor akan mengenali lampu merah untuk berhenti, mendukung kepatuhan pada peraturan lalu lintas, Rambu ini akan Hijau 10 menit dan merah 5 menit.
 * **Halte Otomatis** : Ketika mencapai titik halte, sistem akan memperlambat kecepatan dan berhenti sejenak, mensimulasikan proses menaik-turunkan penumpang.
 * **Monitoring dan Kontrol Manual** : Data posisi, kecepatan, dan status lampu akan dikirim ke dashboard IoT berbasis web atau aplikasi mobile. Operator juga dapat mengambil alih kendali secara manual jika diperlukan.
