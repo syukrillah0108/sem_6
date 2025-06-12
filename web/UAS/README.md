@@ -109,26 +109,8 @@ flowchart TD
 
 ## 6. Teknologi & Struktur Folder
 
-* **Backend** : Laravel 10
-* **Frontend** : Blade + Tailwind CSS
+* **Backend** : Larave
+* **Frontend** : Bootsrap
 * **Database** : MySQL
 * **Version Control** : Git + GitHub
 * **Editor** : VSCode (PHP Intelephense, Laravel Extension Pack)
-
-```
-/app
-  /Http
-    /Controllers
-  /Models
-/resources
-  /views
-    /layouts
-    homepage.blade.php
-    products/index.blade.php
-    products/show.blade.php
-    about.blade.php
-    testimonials.blade.php
-    contact.blade.php
-/routes
-  web.php
-```
