@@ -1,5 +1,3 @@
-
-
 ## 1. Flowchart Navigasi Utama
 
 ```mermaid
@@ -134,7 +132,3 @@ flowchart TD
 /routes
   web.php
 ```
-
----
-
-Dengan rancangan ini, Anda dapat langsung membuat *skeleton* Laravel, mendefinisikan migrasi database, membuat model, controller, dan view sesuai struktur di atas. Semoga membantu!
