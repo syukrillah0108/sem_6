@@ -1,31 +1,31 @@
 <mxfile host="65bd71144e">
     <diagram id="nBs6KPEwt2rRH4-8kB8k" name="Lampu Lalulintas">
-        <mxGraphModel dx="866" dy="622" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="846" dy="757" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
                 <mxCell id="10" value="" style="edgeStyle=none;html=1;strokeWidth=3;" parent="1" source="2" target="3" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="2" value="Mulai" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=4;fontSize=22;fontStyle=1;fillColor=#b0e3e6;strokeColor=#0e8088;" parent="1" vertex="1">
+                <mxCell id="2" value="Mulai" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=4;fontSize=22;fontStyle=1;fillColor=#b0e3e6;strokeColor=#0e8088;fontColor=light-dark(#0e8088, #ededed);" parent="1" vertex="1">
                     <mxGeometry x="50" y="120" width="140" height="140" as="geometry"/>
                 </mxCell>
                 <mxCell id="11" value="" style="edgeStyle=none;html=1;strokeWidth=3;" parent="1" source="3" target="9" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="3" value="Merah" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=4;fontStyle=1;fontSize=22;" parent="1" vertex="1">
+                <mxCell id="3" value="Merah" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=4;fontStyle=1;fontSize=22;fontColor=light-dark(#b85450, #ededed);" parent="1" vertex="1">
                     <mxGeometry x="40" y="320" width="160" height="70" as="geometry"/>
                 </mxCell>
                 <mxCell id="14" value="" style="edgeStyle=none;html=1;strokeWidth=3;" parent="1" source="4" target="13" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="Kuning" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=4;fontStyle=1;fontSize=22;" parent="1" vertex="1">
+                <mxCell id="4" value="Kuning" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=4;fontStyle=1;fontSize=22;fontColor=light-dark(#d6b656, #ededed);" parent="1" vertex="1">
                     <mxGeometry x="280" y="320" width="160" height="70" as="geometry"/>
                 </mxCell>
                 <mxCell id="17" value="" style="edgeStyle=none;html=1;strokeWidth=3;" parent="1" source="5" target="15" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="Hijau" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=4;fontStyle=1;fontSize=22;" parent="1" vertex="1">
+                <mxCell id="5" value="Hijau" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=4;fontStyle=1;fontSize=22;fontColor=light-dark(#82b366, #ededed);" parent="1" vertex="1">
                     <mxGeometry x="510" y="320" width="160" height="70" as="geometry"/>
                 </mxCell>
                 <mxCell id="12" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=3;" parent="1" source="9" target="4" edge="1">
