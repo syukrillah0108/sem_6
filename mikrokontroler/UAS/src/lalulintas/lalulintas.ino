@@ -9,7 +9,7 @@
 // MQTT & WiFi config
 const char* ssid = "DESKTOP-VUEUOOK 9081";
 const char* password = "D8426s3/";
-const char* mqtt_server = "192.168.137.1";
+const char* mqtt_server = "10.42.0.1";
 
 WiFiClient espClient;
 PubSubClient client(espClient);

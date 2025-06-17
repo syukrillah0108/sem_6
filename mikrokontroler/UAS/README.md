@@ -20,3 +20,11 @@ Operasional bus **Travelo Tralala** berlangsung hingga pukul 20:00. Setelah perj
 # Lampu Lalulintas
 
 ![Line](./lampu-3.svg)
+
+# Halte
+
+![Line](./Halte.svg)
+
+# Bus
+
+![Line](./Bus.svg)
