@@ -7,9 +7,12 @@
 #define GREEN_PIN 1
 
 // MQTT & WiFi config
-const char* ssid = "DESKTOP-VUEUOOK 9081";
-const char* password = "D8426s3/";
+const char* ssid = "syukrillah-MEGABOOK-T14DA";
+const char* password = "ec8k0SoA";
 const char* mqtt_server = "10.42.0.1";
+const char* mqtt_user = "user1";
+const char* mqtt_password = "1234567890";
+
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -20,7 +23,7 @@ unsigned long yellowDelay = 1000;
 unsigned long greenDelay = 5000;
 
 void sendState(const char* state) {
-    client.publish("trafficlight/state", state, true);
+    client.publish("trafficlight/state1", state, true);
     Serial.print("Send state: ");
     Serial.println(state);
 }
@@ -54,7 +57,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
     while (!client.connected()) {
         Serial.print("Attempting MQTT connection...");
-        if (client.connect("TrafficLightClient")) {
+        if (client.connect("TrafficLightClient", mqtt_user, mqtt_password)) {
             Serial.println("connected");
             client.subscribe("trafficlight/delay/red");
             client.subscribe("trafficlight/delay/yellow");
@@ -78,7 +81,7 @@ void setup_wifi() {
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
-        Serial.print(".");
+        Serial.print("keniksi ke wifi.... \n");
     }
     Serial.println("");
     Serial.println("WiFi connected");
@@ -116,6 +119,14 @@ void trafficLightTask(void *pvParameters) {
         sendState("GREEN");
         Serial.println("Lampu: HIJAU");
         vTaskDelay(pdMS_TO_TICKS(greenDelay));
+
+        // Kuning (lagi)
+        digitalWrite(RED_PIN, LOW);
+        digitalWrite(YELLOW_PIN, HIGH);
+        digitalWrite(GREEN_PIN, LOW);
+        sendState("YELLOW");
+        Serial.println("Lampu: KUNING (lagi)");
+        vTaskDelay(pdMS_TO_TICKS(yellowDelay));
     }
 }
 
