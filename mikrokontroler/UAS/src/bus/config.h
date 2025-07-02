@@ -9,6 +9,9 @@ const char *password = "ec8k0SoA";
 #define MQTT_USERNAME "user1"
 #define MQTT_PASSWORD "1234567890"
 
+TaskHandle_t mqttTaskHandle = NULL;
+TaskHandle_t lineFollowerTaskHandle = NULL;
+
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -17,8 +20,12 @@ const char* topicKendali = "kendali/mobil";
 
 const char* topicSpeed = "speed/mobil"; // Kecepatan motor
 const char* topicTorsiBelok = "torsi/belok"; // Torsi belok
+const char* topicStateHalte = "state/halte"; // State halte
 
 const char* topicSensor = "mobil/sensor";
+String data_sensor;
+
+void setlineFollowerTask(bool x);
 
 void callback(char* topic, byte* payload, unsigned int length) {
     String msg;
@@ -56,10 +63,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
     } else if (String(topic) == topicMode) {
         if (msg == "MANUAL") {
             Serial.println("Mode Manual");
-            // Tambahkan logika untuk mode manual jika diperlukan
+            setlineFollowerTask(false);
+            autoMode = false;
         } else if (msg == "AUTO") {
             Serial.println("Mode Otomatis");
-            // Tambahkan logika untuk mode otomatis jika diperlukan
+            setlineFollowerTask(true);
+            autoMode = true;
         } else {
             Serial.println("Mode tidak dikenali");
         }
@@ -71,6 +80,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
         torsiBelok = msg.toInt();
         Serial.print("Torsi belok diatur ke: ");
         Serial.println(torsiBelok);
+    } else if (String(topic) == topicStateHalte) {
+        state_berhenti = msg.toInt() * 1000; // Konversi ke milidetik
+    } else {
+        Serial.println("Topik tidak dikenali");
     }
 }
 
@@ -93,11 +106,10 @@ void setup_wifi() {
     Serial.println(WiFi.localIP());
 }
 
-void reconnect() {
+void  reconnect() {
     while (!client.connected()) {
         Serial.print("Mencoba menghubungkan ke broker MQTT...");
-        
-        if (client.connect("ESP32Client", MQTT_USERNAME, MQTT_PASSWORD)) {
+        if (client.connect("BUSClient", MQTT_USERNAME, MQTT_PASSWORD)) {
             Serial.println("terhubung");
             client.subscribe(topicKendali);
             client.subscribe(topicMode);
@@ -116,4 +128,46 @@ void setup_mqtt() {
     client.setServer(MQTT_SERVER, MQTT_PORT);
     client.setCallback(callback);
     reconnect();
+}
+
+void kirim_sensor() {
+    String pesan = String(S1) + "," + String(S2) + "," + String(S3);
+    Serial.print("Kirim Sensor: ");
+    Serial.println(pesan);
+
+    if (client.publish(topicSensor, pesan.c_str())) {
+        Serial.println("Data sensor terkirim");
+    } else {
+        Serial.println("Gagal mengirim data sensor");
+    }
+}
+
+void setlineFollowerTask(bool x){
+    if (x == true){
+        xTaskCreatePinnedToCore(
+            line_following, "Line Follower Task",
+            4096, NULL, 1,
+            &lineFollowerTaskHandle, 0
+        );
+    }else if (x == false){IrSender.sendNEC(R_MERAH, 32);
+        vTaskDelete(lineFollowerTaskHandle);
+        lineFollowerTaskHandle = NULL;
+    }
+}
+
+void mqttClientTask(void *param) {
+    while (1) {
+        if (!client.connected()) {
+            reconnect();
+        }
+        client.loop();
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
+
+void publishDebug(void *param) {
+    while (true){
+        kirim_sensor();
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
 }

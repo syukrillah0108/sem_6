@@ -1,6 +1,19 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
+#include <IRremote.hpp>
+
+const int IR_RECEIVE_PIN = 5;
+// L1
+#define R_MERAH   0x10A1
+#define R_KUNING  0x10B1
+#define R_HIJAU   0x10C1
+/*
+// L2
+#define R_MERAH   0x10A2
+#define R_KUNING  0x10B2
+#define R_HIJAU   0x10C2
+*/
 
 // ---------------------- Konfigurasi -------------------------
 const char* ssid = "syukrillah-MEGABOOK-T14DA";
@@ -8,6 +21,11 @@ const char* password = "ec8k0SoA";
 const char* mqtt_server = "10.42.0.1";
 const char* mqtt_user = "user1";
 const char* mqtt_password = "1234567890";
+
+// ---------------------- MQTT Topic sub and Pub ----------------
+const char* delay_topic = "trafficlight/config/delay1";
+const char* state_topic = "trafficlight/state1";
+const char* client_topic = "TrafficClient1";
 
 const char* device_id = "tl1";
 
@@ -26,9 +44,6 @@ PubSubClient client(espClient);
 // ---------------------- Variabel Waktu & Warna ----------------
 String currentColor = "RED";
 String previousColor = "";
-unsigned long phaseStartTime = 0;
-unsigned long phaseDuration = redDelay;
-unsigned long lastMQTTSend = 0;
 
 // ---------------------- Fungsi MQTT --------------------------
 void sendStateJSON(unsigned long countdown) {
@@ -41,7 +56,7 @@ void sendStateJSON(unsigned long countdown) {
   serializeJson(doc, buffer);
   Serial.print("[MQTT] Kirim JSON: ");
   Serial.println(buffer);
-  client.publish("trafficlight/state1", buffer, true);
+  client.publish(state_topic, buffer, true);
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -55,7 +70,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("]: ");
   Serial.println(msg);
 
-  if (String(topic) == "trafficlight/config/delay") {
+  if (String(topic) == delay_topic) {
     StaticJsonDocument<256> doc;
     DeserializationError error = deserializeJson(doc, msg);
     
@@ -86,13 +101,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
-
 void reconnect() {
   while (!client.connected()) {
     Serial.print("[MQTT] Menghubungkan...");
-    if (client.connect("TrafficLightClient", mqtt_user, mqtt_password)) {
+    if (client.connect(client_topic, mqtt_user, mqtt_password)) {
       Serial.println("berhasil.");
-      client.subscribe("trafficlight/config/delay");
+      client.subscribe(delay_topic);
     } else {
       Serial.print("gagal, rc=");
       Serial.print(client.state());
@@ -120,10 +134,64 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
+// ---------------------- Task Lampu Lalulintas --------------------------
+void trafficLightTask(void *pvParameters) {
+  while (1) {
+    // RED
+    currentColor = "RED";
+    previousColor = "";
+    digitalWrite(RED_PIN, HIGH);
+    digitalWrite(YELLOW_PIN, LOW);
+    digitalWrite(GREEN_PIN, LOW);
+    for (int i = redDelay / 1000; i > 0; i--) {
+      sendStateJSON(i);
+      IrSender.sendNEC(R_MERAH, 32);
+      vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+
+    // YELLOW setelah RED
+    currentColor = "YELLOW";
+    previousColor = "RED";
+    digitalWrite(RED_PIN, LOW);
+    digitalWrite(YELLOW_PIN, HIGH);
+    digitalWrite(GREEN_PIN, LOW);
+    for (int i = yellowDelay / 1000; i > 0; i--) {
+      sendStateJSON(i);
+      IrSender.sendNEC(R_KUNING, 32);
+      vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+
+    // GREEN
+    currentColor = "GREEN";
+    previousColor = "YELLOW";
+    digitalWrite(RED_PIN, LOW);
+    digitalWrite(YELLOW_PIN, LOW);
+    digitalWrite(GREEN_PIN, HIGH);
+    for (int i = greenDelay / 1000; i > 0; i--) {
+      sendStateJSON(i);
+      IrSender.sendNEC(R_HIJAU, 32);
+      vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+
+    // YELLOW setelah GREEN
+    currentColor = "YELLOW";
+    previousColor = "GREEN";
+    digitalWrite(RED_PIN, LOW);
+    digitalWrite(YELLOW_PIN, HIGH);
+    digitalWrite(GREEN_PIN, LOW);
+    for (int i = yellowDelay / 1000; i > 0; i--) {
+      sendStateJSON(i);
+      IrSender.sendNEC(R_KUNING, 32);
+      vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+  }
+}
+
 // ---------------------- Setup --------------------------
 void setup() {
   Serial.begin(115200);
   setup_wifi();
+  IrSender.begin(IR_SEND_PIN);
 
   pinMode(RED_PIN, OUTPUT);
   pinMode(YELLOW_PIN, OUTPUT);
@@ -132,68 +200,21 @@ void setup() {
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 
-  // Set kondisi awal lampu (RED)
-  digitalWrite(RED_PIN, HIGH);
-  digitalWrite(YELLOW_PIN, LOW);
-  digitalWrite(GREEN_PIN, LOW);
-  currentColor = "RED";
-  previousColor = "";
-  phaseStartTime = millis();
-  phaseDuration = redDelay;
+  // Buat task di core 1
+  xTaskCreatePinnedToCore(
+    trafficLightTask,   // Fungsi task
+    "TrafficLightTask", // Nama task
+    4096,               // Stack size
+    NULL,               // Parameter
+    1,                  // Prioritas
+    NULL,               // Handle
+    0                   // Core 0
+  );
 }
 
 // ---------------------- Loop --------------------------
 void loop() {
   if (!client.connected()) reconnect();
   client.loop();
-
-  unsigned long now = millis();
-  unsigned long elapsed = now - phaseStartTime;
-
-  // Hitung countdown
-  unsigned long countdown = (phaseDuration > elapsed) ? (phaseDuration - elapsed) / 1000 : 0;
-
-  // Kirim JSON per detik
-  if (now - lastMQTTSend >= 1000) {
-    lastMQTTSend = now;
-    sendStateJSON(countdown);
-  }
-
-  // Jika waktunya habis, ganti lampu
-  if (elapsed >= phaseDuration) {
-    phaseStartTime = now;
-
-    if (currentColor == "RED") {
-      currentColor = "YELLOW";
-      previousColor = "RED";
-      phaseDuration = yellowDelay;
-      digitalWrite(RED_PIN, LOW);
-      digitalWrite(YELLOW_PIN, HIGH);
-      digitalWrite(GREEN_PIN, LOW);
-
-    } else if (currentColor == "YELLOW" && previousColor == "RED") {
-      currentColor = "GREEN";
-      previousColor = "YELLOW";
-      phaseDuration = greenDelay;
-      digitalWrite(RED_PIN, LOW);
-      digitalWrite(YELLOW_PIN, LOW);
-      digitalWrite(GREEN_PIN, HIGH);
-
-    } else if (currentColor == "GREEN") {
-      currentColor = "YELLOW";
-      previousColor = "GREEN";
-      phaseDuration = yellowDelay;
-      digitalWrite(RED_PIN, LOW);
-      digitalWrite(YELLOW_PIN, HIGH);
-      digitalWrite(GREEN_PIN, LOW);
-
-    } else if (currentColor == "YELLOW" && previousColor == "GREEN") {
-      currentColor = "RED";
-      previousColor = "YELLOW";
-      phaseDuration = redDelay;
-      digitalWrite(RED_PIN, HIGH);
-      digitalWrite(YELLOW_PIN, LOW);
-      digitalWrite(GREEN_PIN, LOW);
-    }
-  }
+  vTaskDelay(pdMS_TO_TICKS(1000));
 }
