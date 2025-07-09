@@ -1,6 +1,6 @@
 # Umum
 
-- Praktikum mejadi salah satu penunjang pengembangan pengetahuan pelajar
+- Praktikum menjadi salah satu penunjang pengembangan pengetahuan pelajar
 - Sarana dan prasana pembelajaran mempengaruhi kualitas pembelajaran
 - Simulasi mempermudah membuat perancangan sistem
 
@@ -8,7 +8,7 @@
 
 Studi kasus **Ruang Labolatorium Liklim Universitas Teknologi Bandung**
 
-- Orang yang mencatat / mengambil data dapat mempengaruhi fokus orang yang sedang melakukan simulasi
+- Mahasiswa yang mencatat / mengambil data dapat mempengaruhi fokus orang yang sedang melakukan simulasi
 - Nilai tidak  begitu stabil karena fokus terganggu
 - Penacacatan manual rawan hialang dan tidak terstruktur, kerana data akan di kumpulkan dan di analisis
 
@@ -23,13 +23,11 @@ Dokumentsi
 
 # Perancangan Solusi
 
-- Penerapan sistem berbasis IoT, guana memudahkan pengumpulan data.
+- Penerapan sistem berbasis IoT, guna memudahkan pengumpulan data.
 - Penggunaan Sensor dan Aktuator untuk menunjang Monitoring dan Kendali Ruangan.
 - Pembuatan Simulasi Suara agar simulasi lebih nyata.
 - Alat berbasis Portable, guna mempermudah penyesuaian dari keinginan pengguna sistem.
 
 # Judul
 
-**Pengoptimalan Sistem Monitoring dan Kendali Ruang Simulasi Industri Berbasis ESP32 dengan Metode Pub-Sub MQTT dan Desain Portabel di Laboratorium Iklim Universitas Teknologi Bandung**
-
-*note: judul lebih menggambarkan alat bukan menggambarkan sistem labolatorium*
+**Implementasi Sistem Monitoring dan Pengendalian Lingkungan Berbasis ESP32 dengan Integrasi MQTT dan Database MySQL di Laboratorium Simulasi Industri Universitas Teknologi Bandung**

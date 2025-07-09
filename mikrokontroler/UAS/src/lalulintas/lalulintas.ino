@@ -3,17 +3,17 @@
 #include <ArduinoJson.h>
 #include <IRremote.hpp>
 
-const int IR_RECEIVE_PIN = 5;
+const int IR_SEND_PIN = 5;
+/*
 // L1
 #define R_MERAH   0x10A1
 #define R_KUNING  0x10B1
 #define R_HIJAU   0x10C1
-/*
+*/
 // L2
 #define R_MERAH   0x10A2
 #define R_KUNING  0x10B2
 #define R_HIJAU   0x10C2
-*/
 
 // ---------------------- Konfigurasi -------------------------
 const char* ssid = "syukrillah-MEGABOOK-T14DA";
@@ -23,11 +23,11 @@ const char* mqtt_user = "user1";
 const char* mqtt_password = "1234567890";
 
 // ---------------------- MQTT Topic sub and Pub ----------------
-const char* delay_topic = "trafficlight/config/delay1";
-const char* state_topic = "trafficlight/state1";
-const char* client_topic = "TrafficClient1";
+const char* delay_topic = "trafficlight/config/delay2";
+const char* state_topic = "trafficlight/state2";
+const char* client_topic = "TrafficClient2";
 
-const char* device_id = "tl1";
+const char* device_id = "tl2";
 
 #define RED_PIN 3
 #define YELLOW_PIN 2

@@ -21,6 +21,9 @@ const char* topicKendali = "kendali/mobil";
 const char* topicSpeed = "speed/mobil"; // Kecepatan motor
 const char* topicTorsiBelok = "torsi/belok"; // Torsi belok
 const char* topicStateHalte = "state/halte"; // State halte
+const char* topicBelokSedikit = "belok/sedikit";
+const char* topicBelokTajam = "belok/tajam";
+const char* topicPosisiMobil = "posisi/mobil"; // Posisi mobil
 
 const char* topicSensor = "mobil/sensor";
 String data_sensor;
@@ -41,22 +44,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if (String(topic) == topicKendali) {
         if (msg == "MAJU") {
             Serial.println("Maju");
-            motorMaju();
+            forward();
         } else if (msg == "MUNDUR") {
             Serial.println("Mundur");
-            motorMundur();
+            backward();
         } else if (msg == "KIRI") {
             Serial.println("Kiri");
-            belokKiri();
+            left();
         } else if (msg == "KANAN") {
             Serial.println("Kanan");
-            belokKanan();
+            right();
         } else if (msg == "BERHENTI") {
             Serial.println("Berhenti");
-            motorStop();
-        } else if (msg == "LURUS") {
-            Serial.println("Lurus");
-            lurus();
+            stop();
         } else {
             Serial.println("Perintah tidak dikenali");
         }
@@ -64,24 +64,28 @@ void callback(char* topic, byte* payload, unsigned int length) {
         if (msg == "MANUAL") {
             Serial.println("Mode Manual");
             setlineFollowerTask(false);
-            autoMode = false;
         } else if (msg == "AUTO") {
             Serial.println("Mode Otomatis");
             setlineFollowerTask(true);
-            autoMode = true;
         } else {
             Serial.println("Mode tidak dikenali");
         }
     } else if (String(topic) == topicSpeed) {
-        speed = msg.toInt();
+        vMax = msg.toInt();
         Serial.print("Kecepatan diatur ke: ");
-        Serial.println(speed);
-    } else if (String(topic) == topicTorsiBelok) {
-        torsiBelok = msg.toInt();
-        Serial.print("Torsi belok diatur ke: ");
-        Serial.println(torsiBelok);
+        Serial.println(vMax);
+    } else if (String(topic) == topicBelokSedikit) {
+        vSoft = msg.toInt();
+        Serial.print("Kecepatan belok sedikit diatur ke: ");
+        Serial.println(vSoft);
+    } else if (String(topic) == topicBelokTajam) {
+        vHard = msg.toInt();
+        Serial.print("Kecepatan belok tajam diatur ke: ");
+        Serial.println(vHard);
     } else if (String(topic) == topicStateHalte) {
-        state_berhenti = msg.toInt() * 1000; // Konversi ke milidetik
+        HalteState = msg.toInt();
+        Serial.print("State halte diatur ke: ");
+        Serial.println(HalteState);
     } else {
         Serial.println("Topik tidak dikenali");
     }
@@ -114,7 +118,8 @@ void  reconnect() {
             client.subscribe(topicKendali);
             client.subscribe(topicMode);
             client.subscribe(topicSpeed);
-            client.subscribe(topicTorsiBelok);
+            client.subscribe(topicBelokSedikit);
+            client.subscribe(topicBelokTajam);
         } else {
             Serial.print("Gagal, rc=");
             Serial.print(client.state());
@@ -131,7 +136,7 @@ void setup_mqtt() {
 }
 
 void kirim_sensor() {
-    String pesan = String(S1) + "," + String(S2) + "," + String(S3);
+    String pesan = String(b1) + "," + String(b2) + "," + String(b3) + "," + String(b4) + "," + String(b5);
     Serial.print("Kirim Sensor: ");
     Serial.println(pesan);
 
@@ -140,16 +145,22 @@ void kirim_sensor() {
     } else {
         Serial.println("Gagal mengirim data sensor");
     }
+
+    if (client.publish(topicPosisiMobil, posisi_bus.c_str())) {
+        Serial.println("Posisi mobil terkirim: " + posisi_bus);
+    } else {
+        Serial.println("Gagal mengirim posisi mobil");
+    }
 }
 
 void setlineFollowerTask(bool x){
     if (x == true){
         xTaskCreatePinnedToCore(
-            line_following, "Line Follower Task",
+            lineFollowerTask, "Line Follower Task",
             4096, NULL, 1,
             &lineFollowerTaskHandle, 0
         );
-    }else if (x == false){IrSender.sendNEC(R_MERAH, 32);
+    }else if (x == false){;
         vTaskDelete(lineFollowerTaskHandle);
         lineFollowerTaskHandle = NULL;
     }
@@ -161,7 +172,10 @@ void mqttClientTask(void *param) {
             reconnect();
         }
         client.loop();
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(30 / portTICK_PERIOD_MS);
+        digitalWrite(LED_BUILTIN, HIGH);
+        vTaskDelay(30 / portTICK_PERIOD_MS);
+        digitalWrite(LED_BUILTIN, LOW);
     }
 }
 

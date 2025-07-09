@@ -1,32 +1,40 @@
-#include <LineFollower.h>
-#include <config.h>
+#include <sensor.h>
+#include <motor.h>
 
-void setup(){
-    Serial.begin(9600);
-    pinMode(LED_BUILTIN, OUTPUT);
-    setupMotor();
-    setupSensor();
-    IrBegin();
-    /*
-    setup_wifi();
-    setup_mqtt();
-    // koenk ke wifi
-    
-    xTaskCreatePinnedToCore(
-        mqttClientTask, "MQTT Client",
-        4096, NULL, 1,
-        &mqttTaskHandle, 0
-    );
-    
-    xTaskCreatePinnedToCore(
-        publishDebug, "Publish Debug",
-        4096, NULL, 1,
-        NULL, 0
-    );
-    */
+bool b1, b2, b3, b4, b5;
+String posisi;
+int HalteState = 0; // lama di halte
+
+void stopAll() {
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, LOW);
+    analogWrite(ENA, 0);
+    analogWrite(ENB, 0);
 }
 
-void loop(){
+void forwardLR(uint8_t vL, uint8_t vR) {
+    // kiri maju
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    analogWrite(ENA, vL);
+    // kanan maju
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+    analogWrite(ENB, vR);
+}
+
+// Gerakan utama
+void goStraight()        { forwardLR(vMax,   vMax  ); }
+void turnLeftSoft()      { forwardLR(vMax,   vSoft ); }
+void turnLeftHard()      { forwardLR(vMax,   vHard ); }
+void turnRightSoft()     { forwardLR(vSoft,  vMax  ); }
+void turnRightHard()     { forwardLR(vHard,  vMax  ); }
+
+void lineFollowerTask(void *param) {while (true){
+
+    IrLoop();
 
     b1 = !digitalRead(S1);
     b2 = !digitalRead(S2);
@@ -120,10 +128,5 @@ void loop(){
             posisi = "🛑";
             break;
     }
-
     vTaskDelay(20 / portTICK_PERIOD_MS);
-    digitalWrite(LED_BUILTIN, HIGH);
-    vTaskDelay(20 / portTICK_PERIOD_MS);
-    digitalWrite(LED_BUILTIN, LOW);
-
-}
+}}
