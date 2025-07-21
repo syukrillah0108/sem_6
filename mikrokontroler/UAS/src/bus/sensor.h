@@ -1,12 +1,12 @@
 #include <IRremote.hpp>
 
-#define S1 1
-#define S2 2
-#define S3 4
-#define S4 6
-#define S5 8
+#define S1 3
+#define S2 5
+#define S3 7
+#define S4 9
+#define S5 11
 
-const int IR_RECEIVE_PIN = 10;
+const int IR_RECEIVE_PIN = 1;
 
 #define R_MERAH_L1   0x85080000
 #define R_KUNING_L1  0x8D080000
@@ -41,18 +41,18 @@ void IrLoop(){
 
         // Cek lampu lalu lintas
         if (ir_data == R_MERAH_L1) {
-            posisi_bus = "L1";
+            posisi_bus = "L1-M";
         } else if (ir_data == R_KUNING_L1) {
-            posisi_bus = "L1";
+            posisi_bus = "L1-K";
         } else if (ir_data == R_HIJAU_L1) {
-            posisi_bus = "L1";
+            posisi_bus = "L1-H";
 
         } else if (ir_data == R_MERAH_L2) {
-            posisi_bus = "L2";
+            posisi_bus = "L2-M";
         } else if (ir_data == R_KUNING_L2) {
-            posisi_bus = "L2";
+            posisi_bus = "L2-K";
         } else if (ir_data == R_HIJAU_L2) {
-            posisi_bus = "L2";
+            posisi_bus = "L2-H";
 
         // Cek halte
         } else if (ir_data == H1) {
@@ -60,9 +60,8 @@ void IrLoop(){
         } else if (ir_data == H2) {
             posisi_bus = "H2";
         } else {
-            Serial.println("Data tidak dikenali");
+            posisi_bus = "";
         }
-
-        IrReceiver.resume(); // Siap terima lagi
+        IrReceiver.resume();
     }
 }

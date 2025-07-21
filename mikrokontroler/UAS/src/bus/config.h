@@ -1,6 +1,3 @@
-#include <WiFi.h>
-#include <PubSubClient.h>
-
 const char *ssid = "syukrillah-MEGABOOK-T14DA";
 const char *password = "ec8k0SoA";
 
@@ -12,9 +9,6 @@ const char *password = "ec8k0SoA";
 TaskHandle_t mqttTaskHandle = NULL;
 TaskHandle_t lineFollowerTaskHandle = NULL;
 
-WiFiClient espClient;
-PubSubClient client(espClient);
-
 const char* topicMode = "mode/mobil"; // manuall/auto
 const char* topicKendali = "kendali/mobil";
 
@@ -24,6 +18,7 @@ const char* topicStateHalte = "state/halte"; // State halte
 const char* topicBelokSedikit = "belok/sedikit";
 const char* topicBelokTajam = "belok/tajam";
 const char* topicPosisiMobil = "posisi/mobil"; // Posisi mobil
+const char* topicKeberangkatanMobil = "berangkat/mobil"; // Brangkat mobil
 
 const char* topicSensor = "mobil/sensor";
 String data_sensor;
@@ -137,20 +132,10 @@ void setup_mqtt() {
 
 void kirim_sensor() {
     String pesan = String(b1) + "," + String(b2) + "," + String(b3) + "," + String(b4) + "," + String(b5);
-    Serial.print("Kirim Sensor: ");
-    Serial.println(pesan);
-
-    if (client.publish(topicSensor, pesan.c_str())) {
-        Serial.println("Data sensor terkirim");
-    } else {
-        Serial.println("Gagal mengirim data sensor");
-    }
-
-    if (client.publish(topicPosisiMobil, posisi_bus.c_str())) {
-        Serial.println("Posisi mobil terkirim: " + posisi_bus);
-    } else {
-        Serial.println("Gagal mengirim posisi mobil");
-    }
+    
+    client.publish(topicSensor, pesan.c_str());
+    client.publish(topicPosisiMobil, posisi_bus.c_str());
+    client.publish(topicKeberangkatanMobil, String(Keberangkatan).c_str());
 }
 
 void setlineFollowerTask(bool x){
@@ -160,7 +145,7 @@ void setlineFollowerTask(bool x){
             4096, NULL, 1,
             &lineFollowerTaskHandle, 0
         );
-    }else if (x == false){;
+    }else if ((x == false) & (lineFollowerTaskHandle != NULL)){;
         vTaskDelete(lineFollowerTaskHandle);
         lineFollowerTaskHandle = NULL;
     }

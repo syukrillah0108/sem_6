@@ -1,9 +1,20 @@
 #include <sensor.h>
 #include <motor.h>
+#include <PubSubClient.h>
+#include <WiFi.h>
+
+WiFiClient espClient;
+PubSubClient client(espClient);
 
 bool b1, b2, b3, b4, b5;
 String posisi;
-int HalteState = 0; // lama di halte
+int HalteState = 10; // lama di halte
+int Keberangkatan = 0;
+uint32_t tmp_halte;
+
+const char* topicSoundHalteA = "sound/haltea";
+const char* topicSoundHalteB = "sound/halteb";
+const char* topicSalam = "sound/salam";
 
 void stopAll() {
     digitalWrite(IN1, LOW);
@@ -32,10 +43,7 @@ void turnLeftHard()      { forwardLR(vMax,   vHard ); }
 void turnRightSoft()     { forwardLR(vSoft,  vMax  ); }
 void turnRightHard()     { forwardLR(vHard,  vMax  ); }
 
-void lineFollowerTask(void *param) {while (true){
-
-    IrLoop();
-
+void LineFollow(){
     b1 = !digitalRead(S1);
     b2 = !digitalRead(S2);
     b3 = !digitalRead(S3);
@@ -51,12 +59,11 @@ void lineFollowerTask(void *param) {while (true){
             stopAll();
             posisi = "🛑";
             break;
-    
-    // MAJU LURUS
         case 0b00000:
-            goStraight();
-            posisi = "⬆️";
-            break;
+            stopAll();
+            posisi = "🛑";
+            break;    
+    // MAJU LURUS
         case 0b01110:
             goStraight();
             posisi = "⬆️";
@@ -124,9 +131,41 @@ void lineFollowerTask(void *param) {while (true){
 
     // pola lain
         default:
-            stopAll();
-            posisi = "🛑";
+            goStraight();
+            posisi = "⬆️";
             break;
     }
+}
+
+void lineFollowerTask(void *param) {while (true){
+    
+    IrLoop();
+    if(H1 == ir_data & tmp_halte != H1) {
+        Keberangkatan = HalteState;
+        stopAll();
+        client.publish(topicSoundHalteA, "1"); // Kirim nilai 1 ke topicSoundHalteA
+        while (Keberangkatan > 1){
+            Keberangkatan--;
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+        tmp_halte = H1;
+    } else if(H2 == ir_data & tmp_halte != H2){
+        Keberangkatan = HalteState;
+        stopAll();
+        while (Keberangkatan > 1){
+            Keberangkatan--;
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+        tmp_halte = H2;
+    } else if(R_MERAH_L1 == ir_data || R_MERAH_L2 == ir_data) {
+        stopAll();
+    } else if(R_KUNING_L1 == ir_data || R_KUNING_L2 == ir_data) {
+        stopAll();
+    } else if(R_HIJAU_L1 == ir_data || R_HIJAU_L2 == ir_data) {
+        LineFollow();
+    } else {
+        LineFollow();
+    }
+    
     vTaskDelay(20 / portTICK_PERIOD_MS);
 }}

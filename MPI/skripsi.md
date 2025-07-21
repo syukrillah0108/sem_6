@@ -6,7 +6,7 @@
 
 # Permasalahan
 
-Studi kasus **Ruang Labolatorium Liklim Universitas Teknologi Bandung**
+Studi kasus **Ruang Liklim Universitas Teknologi Bandung**
 
 - Mahasiswa yang mencatat / mengambil data dapat mempengaruhi fokus orang yang sedang melakukan simulasi
 - Nilai tidak  begitu stabil karena fokus terganggu
@@ -30,4 +30,4 @@ Dokumentsi
 
 # Judul
 
-**Implementasi Sistem Monitoring dan Pengendalian Lingkungan Berbasis ESP32 dengan Integrasi MQTT dan Database MySQL di Laboratorium Simulasi Industri Universitas Teknologi Bandung**
+**Implementasi Sistem Monitoring dan Pengendalian Lingkungan Berbasis ESP32 dengan Integrasi MQTT dan Database MySQL di Ruang Iklim Universitas Teknologi Bandung**

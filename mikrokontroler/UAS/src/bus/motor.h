@@ -1,17 +1,17 @@
-#define ENA 3
-#define ENB 12
+#define ENA 40
+#define ENB 17
 
 // Motor A
-#define IN1  5
-#define IN2  7
+#define IN1  38
+#define IN2  36
 
 // Motor B
-#define IN3  9
-#define IN4  11
+#define IN3  34
+#define IN4  21
 
 uint8_t vMax   = 255;  // full speed
-uint8_t vSoft  = 200;  // speed untuk tikungan ringan
-uint8_t vHard  = 100;  // speed untuk tikungan tajam
+uint8_t vSoft  = 150;  // speed untuk tikungan ringan
+uint8_t vHard  = 50;  // speed untuk tikungan tajam
 
 void setupMotor(){
     pinMode(ENA, OUTPUT);
