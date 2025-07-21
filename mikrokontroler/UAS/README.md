@@ -17,6 +17,10 @@ Operasional bus **Travelo Tralala** berlangsung hingga pukul 20:00. Setelah perj
 * **Halte Otomatis** : Ketika mencapai titik halte, sistem akan memperlambat kecepatan dan berhenti sejenak, mensimulasikan proses menaik-turunkan penumpang.
 * **Monitoring dan Kontrol Manual** : Data posisi, kecepatan, dan status lampu akan dikirim ke dashboard IoT berbasis web atau aplikasi mobile. Operator juga dapat mengambil alih kendali secara manual jika diperlukan.
 
+# Logika Line Follower
+
+![Line](./algoritma.svg)
+
 # Lampu Lalulintas
 
 ![Line](./lampu-3.svg)
