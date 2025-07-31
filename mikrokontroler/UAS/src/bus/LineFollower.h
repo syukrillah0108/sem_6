@@ -11,6 +11,7 @@ String posisi;
 int HalteState = 10; // lama di halte
 int Keberangkatan = 0;
 uint32_t tmp_halte;
+bool tmp_lampu = true;
 
 const char* topicSoundHalteA = "sound/haltea";
 const char* topicSoundHalteB = "sound/halteb";
@@ -143,25 +144,39 @@ void lineFollowerTask(void *param) {while (true){
     if(H1 == ir_data & tmp_halte != H1) {
         Keberangkatan = HalteState;
         stopAll();
-        client.publish(topicSoundHalteA, "1"); // Kirim nilai 1 ke topicSoundHalteA
+        client.publish(topicSalam, "1");
         while (Keberangkatan > 1){
             Keberangkatan--;
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
+        tmp_lampu = true;
         tmp_halte = H1;
+        LineFollow();
     } else if(H2 == ir_data & tmp_halte != H2){
         Keberangkatan = HalteState;
         stopAll();
+        client.publish(topicSalam, "1");
         while (Keberangkatan > 1){
             Keberangkatan--;
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
+        tmp_lampu = true;
         tmp_halte = H2;
+        LineFollow();
     } else if(R_MERAH_L1 == ir_data || R_MERAH_L2 == ir_data) {
         stopAll();
     } else if(R_KUNING_L1 == ir_data || R_KUNING_L2 == ir_data) {
         stopAll();
     } else if(R_HIJAU_L1 == ir_data || R_HIJAU_L2 == ir_data) {
+        if (tmp_lampu){
+            if(R_HIJAU_L1 == ir_data){
+                client.publish(topicSoundHalteA, "1");
+            } else if(R_HIJAU_L2 == ir_data){
+                client.publish(topicSoundHalteB, "1");
+            }
+            tmp_lampu = false;
+        }
+        tmp_halte = NULL;
         LineFollow();
     } else {
         LineFollow();
